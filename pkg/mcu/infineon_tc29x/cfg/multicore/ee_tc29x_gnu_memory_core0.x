@@ -1,7 +1,7 @@
 /*
- * Name: ee_tc27x_gnu_memory_cpu0.x
+ * Name: ee_tc29x_gnu_memory_cpu0.x
  *
- * Description: TC27x memory description for cpu0 in multicore
+ * Description: TC29x memory description for cpu0 in multicore
  * environment
  */
 
@@ -13,7 +13,7 @@ OUTPUT_FORMAT("elf32-tricore")
 OUTPUT_ARCH(tricore)
 ENTRY(_START)
 
- __TRICORE_DERIVATE_MEMORY_MAP__ = 0x270;
+ __TRICORE_DERIVATE_MEMORY_MAP__ = 0x290;
 
 /* Start-up Program Flash Memory */
 __PMU_PFLASH_STARTUP_BEGIN = 0x80000000;
@@ -25,7 +25,7 @@ __PMU_PFLASH_ABS18_SIZE   = 7k;
 
 /*Program Flash Memory (PFLASH0)*/
 __PMU_PFLASH_BEGIN = 0x80004000;
-__PMU_PFLASH_SIZE  = 1984k;
+__PMU_PFLASH_SIZE  = 4080k;
 
 /*Data Flash Memory (DFLASH0)*/
 __PMU_DFLASH0_BEGIN = 0xAF000000;
@@ -44,10 +44,10 @@ __BROM_SIZE = 32K;
 
 /*Scratch-Pad RAM (PSPR)*/
 __PMI_PSPR_BEGIN = 0x70100000;
-__PMI_PSPR_SIZE = 24K;
+__PMI_PSPR_SIZE = 32K;
 /*Local Data RAM (DSPR)*/
 __DMI_DSPR_BEGIN = 0x70000000;
-__DMI_DSPR_SIZE = 112K;
+__DMI_DSPR_SIZE = 120K;
 
 /*Global Data RAM (LMU)*/
 __LMU_SRAM_BEGIN = 0xB0000000;
@@ -69,30 +69,30 @@ MEMORY
   /* - 0x(A)80000020--0x(A)80017FFF Code Application Pattern */
 
   /* - Program Flash Memory for startup (PFLASH0) */
-  PMU_PFLASH_STARTUP (rx!p): org = 0x80000000, len = 1k
+  PMU_PFLASH_STARTUP (rx!p):	org = 0x80000000, len = 1k
 
   /* - Program Flash Memory for 18 bit absolute addressing (PFLASH0) */
-  PMU_PFLASH_ABS18  (rx!p): org = 0x80000400, len = 7k
+  PMU_PFLASH_ABS18 (rx!p):	org = 0x80000400, len = 7k
   /* - Program Flash Memory (PFLASH0). I take 16k for absolute 18 bit
        addressing and for pflash_startup space to be divided between
        the 3 cores */
-  PMU_PFLASH (rx!p):  org = 0x80004000, len = 2032k
+  PMU_PFLASH (rx!p):		org = 0x80004000, len = 4080k
   /* - Data Flash Memory (DFLASH0) */
-  PMU_DFLASH0 (r!xp):  org = 0xAF000000, len = 512k
+  PMU_DFLASH0 (r!xp):		org = 0xAF000000, len = 512k
   /* - Data Flash Memory (DFLASH0_1) */
-  PMU_DFLASH0_1 (r!xp):  org = 0xAF100000, len = 16k
+  PMU_DFLASH0_1 (r!xp):		org = 0xAF100000, len = 16k
   /* - Data Flash Memory (DFLASH1) */
-  PMU_DFLASH1 (r!xp):  org = 0xAF110000, len = 32k
+  PMU_DFLASH1 (r!xp):		org = 0xAF110000, len = 32k
 
   /* - Boot ROM (BROM) */
-  BROM (rx!p):  org = 0x8FFF8000, len = 32k
+  BROM (rx!p):			org = 0x8FFF8000, len = 32k
 
-  /* - Scratch-Pad RAM (PSPR) (0x2500 + 0x3B00 = 24k) */
-  PMI_PSPR (wx!p):  org = 0x70100000, len = 24k
+  /* - Scratch-Pad RAM (PSPR) */
+  PMI_PSPR (wx!p):		org = 0x70100000, len = 32k
   /* - Local Data Scratch-Pad RAM (DSPR) */
-  DMI_DSPR (w!xp): org = 0x70000000, len = 112k
+  DMI_DSPR (w!xp):		org = 0x70000000, len = 120k
   /* - Global Data RAM */
-  LMU_SRAM (w!xp):  org = 0xB0000000, len = 16K
+  LMU_SRAM (w!xp):		org = 0xB0000000, len = 16K
 }
 
 /*

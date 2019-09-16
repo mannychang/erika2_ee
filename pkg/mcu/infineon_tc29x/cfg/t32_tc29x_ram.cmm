@@ -1,35 +1,29 @@
-; Script file for TC275TE on TRIBOARD-TC2X5
+; Script file for TC297TA on TRIBOARD-TC2X7
 ;
 ; Initializes the TriCore and loads ELF into memory.
 ;
 ;
-; Edited by Christoph Kreuzberger, 15:33 16.10.2014
+;
 
 ;========================================================================
 ; initialize and start the debugger
 
-  RESet
-  SYStem.CPU TC27*
-
-  IF CPUIS("TC27*A")||CPUIS("TC27*E")||CPUIS("TC27*F")
+  IF SYStem.MODE()<5
   (
-    ; Emulation Devices in LQFP packages (except Fusion Quad and A-Step)
-    ; do not support JTAG (TDI pin is used as VDDPSB)
-    IF (ID.CABLE()==0x0029)||(ID.CABLE()==0x4155)
-    (
-      ; DAP only supported by 
-      ; - Bi-directional OCDS Debug Cable (0x0029)
-      ; - Automotive Debug Cable (0x4155)
-      SYStem.CONFIG DEBUGPORTTYPE DAP2
-    )
-    ELSE 
-    (
-      DIALOG.OK &core0 CPU()+" not supported by debug cable."
-      ENDDO
-    )
+    SYStem.RESet
+    SYStem.CPU TC297TA
+    CORE.select 0.	; CPU0 is selected for flash programming.
+    SYStem.Up
   )
 
-  SYStem.Up
+  ; Disable Watchdog Timers on TC29xT[E]
+
+  ; Disable the Safety Watchdog Timer (overall system level watchdog):
+  PER.Set D:0xF00360F4 %Long 0x00000008 // SCU_WDTSCON1, Request to disable the WDT
+  ; Disable the CPU Watchdog Timers:
+  PER.Set D:0xF0036104 %Long 0x00000008 // SCU_WDTCPU0CON1, Request to disable the WDT
+  PER.Set D:0xF0036110 %Long 0x00000008 // SCU_WDTCPU1CON1, Request to disable the WDT
+  PER.Set D:0xF003611C %Long 0x00000008 // SCU_WDTCPU2CON1, Request to disable the WDT
 
 ;========================================================================
 ; load demo program
@@ -52,11 +46,11 @@
   #ORTICMD#
 
 ; open some windows
-  WinCLEAR
-  WinPOS 0% 0% 100% 50%
-  Data.List
-  WinPOS 0% 50% 50% 50%
-  Var.Frame /Locals /Caller
-  WinPOS 50% 50% 50% 50%
+;  WinCLEAR
+;  WinPOS 0% 0% 100% 50%
+;  Data.List
+;  WinPOS 0% 50% 50% 50%
+;  Var.Frame /Locals /Caller
+;  WinPOS 50% 50% 50% 50%
 
 ENDDO

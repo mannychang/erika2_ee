@@ -1,4 +1,4 @@
-; Script file for TC275TE on TRIBOARD-TC2X5
+; Script file for TC297TA on TRIBOARD-TC2X7
 ;
 ; Initializes the TriCore opens AMP environment.
 ;
@@ -23,7 +23,7 @@ GOSUB other_guis
 ; initialize and start the debugger:
 
   &coreAll RESet
-  &coreAll SYStem.CPU TC275TE-ASTEP
+  &coreAll SYStem.CPU TC297TA
   ; mount all cores into the same chip:
   &core0 SYStem.CONFIG CORE 1. 1.
   &core1 SYStem.CONFIG CORE 2. 1.
@@ -36,6 +36,15 @@ GOSUB other_guis
   &coreAll SYStem.Option DUALPORT ON
   &coreAll SETUP.VAR %SpotLight
   &coreAll MAP.BOnchip 0x0--0xffffffff // force onchip-breakpoints
+
+  ; Disable Watchdog Timers on TC29xT[E]
+
+  ; Disable the Safety Watchdog Timer (overall system level watchdog):
+  PER.Set D:0xF00360F4 %Long 0x00000008 // SCU_WDTSCON1, Request to disable the WDT
+  ; Disable the CPU Watchdog Timers:
+  PER.Set D:0xF0036104 %Long 0x00000008 // SCU_WDTCPU0CON1, Request to disable the WDT
+  PER.Set D:0xF0036110 %Long 0x00000008 // SCU_WDTCPU1CON1, Request to disable the WDT
+  PER.Set D:0xF003611C %Long 0x00000008 // SCU_WDTCPU2CON1, Request to disable the WDT
 
 ;========================================================================
 ; Load elf file (uses internal RAM only)
@@ -61,9 +70,9 @@ IF Analyzer()
   ; Workaround: f(MAX) = f(MCDS) = f(BBB)
   ; For 100MHz: MAXDIV = 0x2, BBBDIV = 0x1, MCDSDIV = 0x1
   ; For 50MHz:  MAXDIV = 0x4, BBBDIV = 0x1, MCDSDIV = 0x1
-  PER.Set D:0xF0036034 %Long (Data.Long(D:0xF0036034)&~0x00F)|0x002   ; MAXDIV = 0x2, for 100 MHz
+  ;PER.Set D:0xF0036034 %Long (Data.Long(D:0xF0036034)&~0x00F)|0x002   ; MAXDIV = 0x2, for 100 MHz
   ;PER.Set D:0xF0036034 %Long (Data.Long(D:0xF0036034)&~0x00F)|0x004 ; MAXDIV = 0x4, for 50 MHz
-  PER.Set D:0xF0036040 %Long (Data.Long(D:0xF0036040)&~0xF0F)|0x101   ; BBBDIV = 0x1, MCDSDIV = 0x1
+  ;PER.Set D:0xF0036040 %Long (Data.Long(D:0xF0036040)&~0xF0F)|0x101   ; BBBDIV = 0x1, MCDSDIV = 0x1
 )
 
 ;========================================================================
@@ -79,7 +88,7 @@ IF Analyzer()
   &coreAll Data.List
   &coreAll WinPOS 0% 67% 100% 33%
   &coreAll Var.Watch
-  
+
   &coreAll WinCLEAR
   &coreAll WinPOS 0% 0% 100% 50%
   &coreAll List.auto
@@ -88,15 +97,17 @@ IF Analyzer()
   &coreAll WinPOS 0% 80% 100% 20%
   &coreAll AREA
 
-  ;set up synchronization between GUIs
+;set up synchronization between GUIs
   &coreAll SYnch.Connect &addressGUI0 &addressGUI1 &addressGUI2
   ; required when setting breakpoints on slave GUIs:
-  &core0 SYnch.MasterGo ON
-  &core1 SYnch.SlaveGo ON
-  &core2 SYnch.SlaveGo ON
+  ;&core0 SYnch.MasterGo ON
+  ;&core1 SYnch.SlaveGo ON
+  ;&core2 SYnch.SlaveGo ON
+  &coreAll SYnch.MasterGo ON
+  &coreAll SYnch.SlaveGo ON
   ; optional:
-  ; &coreAll SYnch.MasterBreak ON
-  ; &coreAll SYnch.SlaveBreak ON
+  &coreAll SYnch.MasterBreak ON
+  &coreAll SYnch.SlaveBreak ON
 
 ; Load ORTI Support
 #ORTICDMASTER#
@@ -170,14 +181,14 @@ other_guis:
   IF !INTERCOM.PING(&addressGUI1)
   (
     PRINT "no debugger / GUI at &addressGUI1 detected, launching second GUI..."
-    &launchGUI=OS.PEF()+" -c config_tc27x_mc.t32 &portGUI1 Trace32_CORE1 &p3_tmp &p4_sys &p5_help &p6_pbi &p7_opt &p8_opt CORE=2 &p9_bgnd"
+    &launchGUI=OS.PEF()+" -c config_tc29x_mc.t32 &portGUI1 Trace32_CORE1 &p3_tmp &p4_sys &p5_help &p6_pbi &p7_opt &p8_opt CORE=2 &p9_bgnd"
     OS &launchGUI
   )
   WAIT INTERCOM.PING(&addressGUI2) 5.s
   IF !INTERCOM.PING(&addressGUI2)
   (
     PRINT "no debugger / GUI at &addressGUI2 detected, launching third GUI..."
-    &launchGUI=OS.PEF()+" -c config_tc27x_mc.t32 &portGUI2 Trace32_CORE2 &p3_tmp &p4_sys &p5_help &p6_pbi &p7_opt &p8_opt CORE=3 &p9_bgnd"
+    &launchGUI=OS.PEF()+" -c config_tc29x_mc.t32 &portGUI2 Trace32_CORE2 &p3_tmp &p4_sys &p5_help &p6_pbi &p7_opt &p8_opt CORE=3 &p9_bgnd"
     OS &launchGUI
   )
   WAIT INTERCOM.PING(&addressGUI1) 5.s

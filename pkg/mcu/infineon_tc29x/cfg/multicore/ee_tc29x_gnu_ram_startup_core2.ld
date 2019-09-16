@@ -9,13 +9,12 @@ SECTIONS {
   /*
    * Code sections
    */
-  EE_tc2Yx_cpu1_start :
+  EE_tc2Yx_cpu2_start :
   {
-    KEEP(*(*.EE_tc2Yx_cpu1_start))
+    KEEP(*(*.EE_tc2Yx_cpu2_start))
     . = ALIGN(8);
-  } > PMU_PFLASH
+  } > PMI_PSPR
 }
 
   /* Make sure that EE_tc2Yx_cpu1_start symbol is in the right place. */
-  _. = ASSERT (EE_tc2Yx_cpu1_start == 0x80200000, "EE_tc2Yx_cpu1_start is not in the right place");
-
+  _. = ASSERT (EE_tc2Yx_cpu2_startT == 0x50100000, "EE_tc2Yx_cpu2_start is not in the right place");

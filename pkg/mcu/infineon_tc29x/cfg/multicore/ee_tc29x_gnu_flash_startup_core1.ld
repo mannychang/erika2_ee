@@ -57,6 +57,6 @@ SECTIONS {
   /* Make sure that _START symbol is in the right place. */
   _. = ASSERT (_START == 0x80000020, "_START is not in the right place");
   /* Make sure that EE_tc2Yx_cpu1_start symbol is in the right place. */
-  _. = ASSERT (EE_tc2Yx_cpu1_start == 0x80100000, "EE_tc2Yx_cpu1_start is not in the right place");
+  _. = ASSERT (EE_tc2Yx_cpu1_start == 0x80400000, "EE_tc2Yx_cpu1_start is not in the right place");
 
 
